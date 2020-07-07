@@ -20,4 +20,4 @@ Code updated to include:
 4) Optional o'clock LEDs ('It is ten o'clock' rather than 'it is ten' in the original code). This needs a bit of tape on the faceplate to convert the R to a '
 5) Optional color change per minute to 'it is' between normal clock updates so you can determine the time to the nearest minute
 6) DST code for UK/Europe
-7) Optional (suggest temporary) button connections to adjust the RTC to the +- 2 seconds
+7) Optional (suggest temporary) button connections to adjust the RTC by +- 2 seconds
