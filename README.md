@@ -17,7 +17,7 @@ Code updated to include:
 1) Test NeoPixel Matrix on startup
 2) Optional different color LED's for AM & PM display.
 3) Optional minutes LEDs ('It is twenty minutes past five' rather than 'it is twenty past five' in the original code).
-4) Optional O'clock LEDs ('It is ten o'clock' rather than 'it is ten' in the original code). This needs a bit of tape on the faceplate to convert the R to a '
+4) Optional o'clock LEDs ('It is ten o'clock' rather than 'it is ten' in the original code). This needs a bit of tape on the faceplate to convert the R to a '
 5) Optional color change per minute to 'it is' between normal clock updates so you can determine the time to the nearest minute
 6) DST code for UK/Europe
 7) Optional (suggest temporary) button connections to adjust the RTC to the +- 2 seconds
