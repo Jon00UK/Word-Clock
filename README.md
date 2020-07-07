@@ -21,3 +21,7 @@ Code updated to include:
 5) Optional color change per minute to 'it is' between normal clock updates so you can determine the time to the nearest minute
 6) DST code for UK/Europe
 7) Optional (suggest temporary) button connections to adjust the RTC by +- 2 seconds
+
+![Word Clock 2](https://www.jon00.me.uk/images/WC2.jpg)
+
+![Word Clock 1](https://www.jon00.me.uk/images/WC1.jpg)
