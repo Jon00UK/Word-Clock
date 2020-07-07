@@ -8,6 +8,8 @@ Each individual LED corresponds to specific written sentence.
 
 Full Step-by-Step Guide: Word Clock by DIY Machines
 
+https://www.electromaker.io/project/view/word-clock-customisable-and-easy-to-build
+
 https://www.instructables.com/id/Arduino-Word-Clock-Customisable-and-Easy-to-Build/
 
 https://www.youtube.com/watch?v=LfL7t2hF90k&feature=emb_logo
