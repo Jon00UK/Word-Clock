@@ -33,6 +33,14 @@ DateTime theTime; // Holds current clock time
 
 int dst; // holds Europe/UK DST flag (1 = DST, 0 = Off)
 
+// *** SETTINGS 1 ****
+
+int dstMode = 0; // 0=Auto DST (EU/UK), 1 = Auto DST (USA/Canada), 2 = DST Disabled, 3 = DST Enabled
+
+int updateTime = 0; // Set to 1 if you wish to reset your RTC time (from PC) to be compatible with this sketch, compile/upload, then set to 0 and compile/upload again.
+
+// ******************
+
 
 // configure for 8x8 neopixel matrix
 Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(8, 8, NEOPIN,
@@ -72,10 +80,12 @@ void setup() {
   Wire.begin();  // Begin I2C
   RTC.begin();   // begin clock
 
-
-  if (! RTC.isrunning()) {
-    RTC.adjust(DateTime(__DATE__, __TIME__));
-    dst = dstFLAG();
+  if (! RTC.isrunning()) updateTime = 1;
+  
+  if (updateTime == 1) {
+  Serial.println("Setting RTC from PC ...");
+  RTC.adjust(DateTime(__DATE__, __TIME__));
+    dst = dstFLAG(dstMode);
     theTime = RTC.now();
     if (dst == 1) {
       Serial.println("DST in operation - setting RTC back by one hour");
@@ -84,9 +94,7 @@ void setup() {
       theTime = RTC.now();
       displayTime();
     }
-
   }
-
 
   matrix.begin();
 
@@ -94,7 +102,7 @@ void setup() {
 
   // Set all pixels to white
   for (int i = 0; i < 8; i++) {
-    for (int j = 0; j < 8; j++) {
+  for (int j = 0; j < 8; j++) {
       matrix.drawPixel(i, j, matrix.Color(255, 255, 255));
     }
   }
@@ -103,7 +111,7 @@ void setup() {
   delay(5000);
 
 
-  
+
   matrix.setBrightness(100);
   matrix.fillScreen(0); // Initialize all pixels to 'off'
   matrix.show();
@@ -116,7 +124,7 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   theTime = RTC.now();
-  dst = dstFLAG();
+  dst = dstFLAG(dstMode);
   if (dst == 1) theTime = theTime.unixtime() + 3600;
 
   // connect NANO D10 via switch to ground to adjust RTC by + 2 seconds on each poll. Keep switch pressed until desired time correction is shown via serial print!
@@ -135,7 +143,7 @@ void loop() {
     RTC.adjust(DateTime(theTime.year(), theTime.month(), theTime.day(), theTime.hour(), theTime.minute(), theTime.second()));
   }
 
-  // *** SETTINGS ***
+  // *** SETTINGS 2 ***
 
   //Display Minutes LEDs.
   int m = 1;  // 0=OFF, 1=ON
@@ -148,6 +156,8 @@ void loop() {
 
   //Display AM & PM in a different color.
   int ampmColor = 1; // 0=OFF, 1=ON
+
+  // *******************
 
   //write 'it is' everytime:
   ledOn(0, 0);
@@ -609,7 +619,7 @@ void itisColor(int status) {
 
         matrix.drawPixel(0, 0, matrix.Color(0, 255, 255));
         matrix.drawPixel(0, 1, matrix.Color(0, 255, 255));
-       //matrix.drawPixel(0, 2, matrix.Color(0, 255, 255));
+        //matrix.drawPixel(0, 2, matrix.Color(0, 255, 255));
         Serial.println("'it is' showing color 4 ");
         break;
     }
@@ -698,14 +708,38 @@ void minutes(int status) {
   }
 }
 
-int dstFLAG() {
+int dstFLAG(int status) {
   //check for dst (EU/UK)
   DateTime rtcTime = RTC.now();
   int dst = 0;
-  if (rtcTime.month() < 3 || rtcTime.month() > 10) dst = 0;
-  if (rtcTime.month() > 3 && rtcTime.month() < 10) dst = 1;
-  if (rtcTime.month() == 3 && rtcTime.day() < 25) dst = 0;
-  if (rtcTime.month() == 10 && rtcTime.day() < 25) dst = 1;
-  if (rtcTime.month() == 3 && (rtcTime.hour() + 24 * rtcTime.day()) >= (1 + 24 * (31 - (5 * rtcTime.year() / 4 + 4 % 7))) || rtcTime.month() == 10 && (rtcTime.hour() + 24 * rtcTime.day()) < (1 + 24 * (31 - (5 * rtcTime.year() / 4 + 1) % 7 ))) dst = 1;
+
+  switch (status) {
+    case 0:
+      if (rtcTime.month() < 3 || rtcTime.month() > 10) dst = 0;
+      if (rtcTime.month() > 3 && rtcTime.month() < 10) dst = 1;
+      if (rtcTime.month() == 3 && rtcTime.day() < 25) dst = 0;
+      if (rtcTime.month() == 10 && rtcTime.day() < 25) dst = 1;
+      if (rtcTime.month() == 3 && (rtcTime.hour() + 24 * rtcTime.day()) >= (1 + 24 * (31 - (5 * rtcTime.year() / 4 + 4 % 7))) || rtcTime.month() == 10 && (rtcTime.hour() + 24 * rtcTime.day()) < (1 + 24 * (31 - (5 * rtcTime.year() / 4 + 1) % 7 ))) dst = 1;
+      break;
+    case 1:
+      int y = rtcTime.year() - 2000;
+      int x = (y + y / 4 + 2) % 7;
+
+      if (rtcTime.month() == 3 && rtcTime.day() == (14 - x) && rtcTime.hour() >= 2) dst = 1;
+      if (rtcTime.month() == 3 && rtcTime.day() > (14 - x) || rtcTime.month() > 3) dst = 1;
+      if (rtcTime.month() == 11 && rtcTime.day() == (7 - x) && rtcTime.hour() >= 2) dst = 0;
+      if (rtcTime.month() == 11 && rtcTime.day() > (7 - x) || rtcTime.month() > 11 || rtcTime.month() < 3) dst = 0;
+      break;
+    case 2:
+      dst = 0;
+      break;
+
+    case 3:
+      dst = 1;
+      break;
+  }
+
   return dst; // 1 = dst otherwise 0
+
+
 }
