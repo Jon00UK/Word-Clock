@@ -544,7 +544,7 @@ void loop() {
 
         if (ampmColor = 1) {
           // Serial.println("AMPM flag set");
-          if (theTime.hour() < 13) {
+          if (theTime.hour() < 12) {
             // Set color for AM
             //Serial.println("AMPM AM");
             matrix.drawPixel(i, j, matrix.Color(255, 255, 0));
